@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <style>
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        height: 100px;
+        display: flex;
+        border: 1px solid #000;
+      }
+      li {
+        margin: 0;
+        width: 100px;
+        flex-grow: 1; /* 남은 여백 배분해서 지정이 아니라 덧셈 */
+      }
+
+      li:nth-of-type(1) {
+        background: red;
+      }
+      li:nth-of-type(2) {
+        background: blue;
+      }
+      li:nth-of-type(3) {
+        background: green;
+      }
+    </style>
+    <ul>
+      <li>메뉴1</li>
+      <li>메뉴2</li>
+      <li>메뉴3</li>
+    </ul>
+  </body>
+</html>

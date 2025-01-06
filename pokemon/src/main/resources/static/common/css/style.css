@@ -1,0 +1,50 @@
+.dn {
+    display: none !important;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex.ac {
+    align-items: center;
+}
+
+/* 레이어 팝업 S */
+.layer-dim{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background:rgba(0, 0, 0, 0.7);
+}
+
+.layer-popup{
+    position: fixed;
+    z-index: 101;
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+}
+
+.layer-content{
+    border: 1px solid #ccc;
+}
+
+.layer-close{
+    top: -20px;
+    right: -20px;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    backgroundL: #fff;
+    border: 3px solid #000;
+    text-align: center;
+    line-height: 24px;
+ }
+
+.layer-close i{
+    font-size: 1.5rem;
+}
+/* 레이어 팝업 E */

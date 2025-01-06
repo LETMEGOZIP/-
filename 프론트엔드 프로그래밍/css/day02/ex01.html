@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stlesheet" type="text/css" href="css/style.css" />
+  </head>
+  <body>
+    <style>
+      ul::after {
+        content: "AFTER";
+        color: white;
+        background: red;
+        /* after, before는 content에 필수 속성 */
+      }
+
+      ul::before {
+        content: "BEFORE";
+        color: white;
+        background: blue;
+        height: 100;
+        display: block;
+        width: 100; /* display로 지정 안 할 시 인라인 속성이라 그냥 적용 안됨 */
+      }
+    </style>
+    <ul>
+      <li>메뉴1</li>
+      <li>메뉴2</li>
+      <li>메뉴3</li>
+    </ul>
+  </body>
+</html>
