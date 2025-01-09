@@ -74,35 +74,45 @@ public class MemberController implements SubMenus {
         return "common/_execute_script";
     }
 
-    @GetMapping("/info/{mapping}")
-    public String info(String email, Model model){
+    /**
+     * 회원정보 수정
+     * @param email
+     * @param model
+     * @return
+     */
+    @GetMapping("/info/{email}")
+    public String info(@PathVariable("email") String email, Model model) {
         commonProcess("info", model);
 
         RequestProfile form = memberInfoService.getProfile(email);
         model.addAttribute("requestProfile", form);
 
-
         return "admin/member/info";
     }
 
     @PatchMapping("/info")
-    public String  infoPs(@Valid RequestProfile form, Errors errors, Model model){
+    public String infoPs(@Valid RequestProfile form, Errors errors, Model model) {
+        commonProcess("info", model);
+
         profileValidator.validate(form, errors);
 
-        if(errors.hasErrors()){
+        if (errors.hasErrors()) {
             return "admin/member/info";
         }
+
         memberUpdateService.process(form, form.getAuthorities());
+
         model.addAttribute("script", "parent.location.reload();");
         return "common/_execute_script";
     }
 
-    @GetMapping("/messages")
-    public String messageList(Model model){
+    @GetMapping("/message")
+    public String messageList(Model model) {
         commonProcess("message", model);
 
         return "admin/member/message";
     }
+
     /**
      * 공통 처리 부분
      *
@@ -118,15 +128,22 @@ public class MemberController implements SubMenus {
         String pageTitle = "";
         if (mode.equals("list")) {
             pageTitle = "회원목록";
-        } else if(mode.equals("info")){
-            pageTitle="회원 정보 수정";
+
+        } else if (mode.equals("info")) {
+            pageTitle = "회원정보 수정";
+
+            addCommonScript.add("address");
             addCommonScript.add("fileManager");
             addScript.add("member/info");
+        } else if (mode.equals("message")) {
+            pageTitle = "쪽지관리";
         }
         
         pageTitle += " - 회원관리";
 
         model.addAttribute("pageTitle", pageTitle);
         model.addAttribute("subMenuCode", mode);
+        model.addAttribute("addCommonScript", addCommonScript);
+        model.addAttribute("addScript", addScript);
     }
 }

@@ -7,17 +7,19 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 
 public class TempDirTest {
+
     @TempDir
-    private File tempDir;
+    private static File tempDir;
 
     @Test
-    void test1(){
+    void test1() {
         String path = tempDir.getAbsolutePath();
         System.out.println(path);
     }
 
     @AfterAll
-    static void destroy(){
-
+    static void destroy() {
+        tempDir.delete();
+        System.out.println(tempDir.exists());
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Builder
 @NoArgsConstructor @AllArgsConstructor
-@Table(indexes = @Index(name="itx_notice_createdAt", columnList = "notice DESC, createdAt DESC"))
+@Table(indexes = @Index(name="idx_notice_created_at", columnList = "notice DESC, createdAt DESC"))
 public class Message extends BaseEntity {
     @Id @GeneratedValue
     private Long seq;
@@ -31,14 +31,14 @@ public class Message extends BaseEntity {
     private MessageStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender")
+    @JoinColumn(name="sender")
     private Member sender; // 보내는 사람
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver")
+    @JoinColumn(name="receiver")
     private Member receiver; // 받는 사람
 
-    @Column(length = 150, nullable = false)
+    @Column(length=150, nullable = false)
     private String subject; // 제목
 
     @Lob
@@ -57,7 +57,7 @@ public class Message extends BaseEntity {
     @Transient
     private boolean deletable; // 삭제 가능 여부
 
-    private boolean deletedBySender;
+    private boolean deletedBySender; // 보내는 쪽에서 쪽지를 삭제한 경우
 
-    private boolean deletedByReceiver;
+    private boolean deletedByReceiver; // 받는 쪽에서 쪽지를 삭제한 경우
 }

@@ -14,26 +14,30 @@ import org.springframework.validation.Validator;
 @Component
 @RequiredArgsConstructor
 public class MessageValidator implements Validator {
+
     private final MemberUtil memberUtil;
     private final MemberRepository memberRepository;
 
     @Override
-    public boolean supports(Class<?> clazz){
+    public boolean supports(Class<?> clazz) {
         return clazz.isAssignableFrom(RequestMessage.class);
     }
 
     @Override
-    public void validate(Object target, Errors errors){
+    public void validate(Object target, Errors errors) {
         RequestMessage form = (RequestMessage) target;
         String email = form.getEmail();
         boolean notice = form.isNotice();
-        if(!memberUtil.isAdmin() && notice){
+        if (!memberUtil.isAdmin() && notice) { // 관리자가 아니지만 공지 쪽지이면 X
             notice = false;
             form.setNotice(notice);
         }
-        if(!memberUtil.isAdmin() && !notice && !StringUtils.hasText(email)){
+
+        if (!memberUtil.isAdmin() && !notice && !StringUtils.hasText(email)) {
             errors.rejectValue("email", "NotBlank");
-        } else if(!notice && !memberRepository.exists(email)){ // 수신하는 쪽 회원이 존재 x
+        }
+
+        if (!notice && !memberRepository.exists(email)) {
             errors.reject("NotFound.member");
         }
     }

@@ -40,7 +40,6 @@ public class RequestProfile {
 
     @NotBlank
     private String address;
-
     private String addressSub;
 
     private List<String> optionalTerms; // 추가 선택 약관

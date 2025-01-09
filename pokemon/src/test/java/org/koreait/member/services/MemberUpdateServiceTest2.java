@@ -63,6 +63,7 @@ public class MemberUpdateServiceTest2 {
         assertDoesNotThrow(() -> {
             service.process(profile);
         });
+
         Member member = repository.findByEmail(profile.getEmail()).orElse(null);
         assertEquals(profile.getName(), member.getName());
     }

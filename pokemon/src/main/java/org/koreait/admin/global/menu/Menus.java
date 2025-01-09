@@ -18,7 +18,8 @@ public class Menus {
 
         // 회원관리
         submenus.put("member", List.of(
-           new MenuDetail("list", "회원목록", "/admin/member/list")
+                new MenuDetail("list", "회원목록", "/admin/member/list"),
+                new MenuDetail("message", "쪽지관리", "/admin/member/message")
         ));
 
         // 게시판관리
@@ -28,12 +29,12 @@ public class Menus {
            new MenuDetail("posts", "게시글관리", "/admin/board/posts")
         ));
 
-        // 상품 관리
+        // 상품관리
         submenus.put("product", List.of(
            new MenuDetail("list", "상품목록", "/admin/product/list"),
            new MenuDetail("add", "상품등록", "/admin/product/add"),
                 new MenuDetail("category", "분류관리", "/admin/product/category"),
-                new MenuDetail("delivery", "배송정책관리", "admin/product/delivery")
+                new MenuDetail("delivery", "배송정책관리", "/admin/product/delivery")
         ));
     }
 

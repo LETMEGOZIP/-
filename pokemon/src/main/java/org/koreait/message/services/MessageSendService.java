@@ -22,7 +22,8 @@ public class MessageSendService {
     private final MessageRepository repository;
     private final FileDoneService fileDoneService;
 
-    public Message process(RequestMessage form){
+    public Message process(RequestMessage form) {
+
         String email = form.getEmail();
         Member receiver = !form.isNotice() ? memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new) : null;
 

@@ -21,12 +21,14 @@ public class MessageDeleteService {
 
     /**
      * 삭제 처리
-     * 0. 공지인 경우에는 관리자만 삭제 가능
-     * 1.sender 쪽에서 삭제하는 경우 / mode - send
+     * 0. 공지인 경우는 관리자인 경우만 삭제
+     * 1. sender 쪽에서 삭제하는 경우 / mode - send
      *      deletedBySender 값을 true
-     * 2. receiver 쪽에서 삭제하는 경우 / mode - send
+     * 2. receiver 쪽에서 삭제 하는 경우 / mode - receive
      *      deletedByReceiver 값을 true
      * 3. deletedBySender와 deletedByReceiver가 모두 true인 경우 실제 DB에서도 삭제(Message 쪽 삭제, 파일 데이터 함께 삭제)
+     *
+     *
      * @param seq
      */
     public void process(Long seq, String mode) {
@@ -42,17 +44,18 @@ public class MessageDeleteService {
             }
         } // endif
 
-        if(mode.equals("send")){
+        if (mode.equals("send")) { // 보낸 쪽 
             item.setDeletedBySender(true);
-        } else {
+        } else { // 받는 쪽
             item.setDeletedByReceiver(true);
         }
 
-        if(item.isDeletedByReceiver() && item.isDeletedBySender()){
-            isProceedDelete = true; // 보낸 쪽 받는 쪽 모두 삭제 한 경우 -> db에서 삭제
+        if (item.isDeletedBySender() && item.isDeletedByReceiver()) {
+            isProceedDelete = true; // 보낸쪽, 받는쪽 모두 삭제 한 경우 -> DB에서 삭제
         }
+
         // 삭제 진행이 필요한 경우 처리
-        if(isProceedDelete){
+        if (isProceedDelete) {
             String gid = item.getGid();
 
             // DB에서 삭제

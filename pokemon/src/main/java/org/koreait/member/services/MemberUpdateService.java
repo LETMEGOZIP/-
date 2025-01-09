@@ -78,7 +78,8 @@ public class MemberUpdateService {
 
     public void process(RequestProfile form, List<Authority> authorities) {
         String email = form.getEmail();
-        Member member = memberUtil.isAdmin() && StringUtils.hasText(email) ? memberRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException(email)) : memberUtil.getMember(); // 로그인한 사용자의 정보
+        Member member = memberUtil.isAdmin() && StringUtils.hasText(email) ? memberRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email)) : memberUtil.getMember(); // 로그인한 사용자의 정보
+
         member.setName(form.getName());
         member.setNickName(form.getNickName());
         member.setBirthDt(form.getBirthDt());
@@ -117,7 +118,7 @@ public class MemberUpdateService {
         save(member, _authorities);
 
         // 로그인 회원 정보 업데이트
-        if(!StringUtils.hasText(email)) {
+        if (!StringUtils.hasText(email)) {
             Member _member = memberRepository.findByEmail(member.getEmail()).orElse(null);
             if (_member != null) {
                 infoService.addInfo(_member);

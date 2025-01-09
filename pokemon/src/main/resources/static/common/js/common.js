@@ -1,4 +1,4 @@
-var commonLib = commonLib ?? {}; // 정의 안되어있으면 빈걸로 만든
+var commonLib = commonLib ?? {};
 
 /**
 * 메타 태그 정보 조회
@@ -29,13 +29,13 @@ commonLib.url = function(url) {
 * @params data : 요청 데이터(POST, PATCH, PUT ...)
 * @params headers : 추가 요청 헤더
 */
-commonLib.ajaxLoad = function(url, callback, method = 'GET', data, headers, isText=false) {
+commonLib.ajaxLoad = function(url, callback, method = 'GET', data, headers, isText = false) {
     if (!url) return;
 
     const { getMeta } = commonLib;
     const csrfHeader = getMeta("_csrf_header");
     const csrfToken = getMeta("_csrf");
-    url = /^http[s]?:/.test(url) ? url : getMeta("rootUrl") + url.replace("/", "");
+    url = /^http[s]?:/.test(url) ? url : commonLib.url(url);
 
     headers = headers ?? {};
     headers[csrfHeader] = csrfToken;
@@ -89,35 +89,32 @@ commonLib.ajaxLoad = function(url, callback, method = 'GET', data, headers, isTe
 * 레이어 팝업
 *
 */
-commonLib.popup = function(url, width = 350, height = 350, isAjax = false) {
-    /* 레이어 팝업 요소 동적 추가 S */
+commonLib.popup = function(url, width = 350, height = 350, isAjax = false, message) {
+    /* 레이어팝업 요소 동적 추가 S */
+    const layerEls = document.querySelectorAll(".layer-dim, .layer-popup");
+    layerEls.forEach(el => el.parentElement.removeChild(el));
 
-    const layerDim = document.getElementsByClassName(".layer-dim, .layer-popup");
-    layerDim.forEach(el => el.parentElement.removeChild(el));
-
-    layerDim = document.createElement("div");
+    const layerDim = document.createElement("div");
     layerDim.className = "layer-dim";
 
-    LayerPopup = document.createElement("div");
+    const layerPopup = document.createElement("div");
     layerPopup.className = "layer-popup";
-
-
 
     /* 레이어 팝업 가운데 배치 S */
     const xpos = (innerWidth - width) / 2;
     const ypos = (innerHeight - height) / 2;
     layerPopup.style.left = xpos + "px";
     layerPopup.style.top = ypos + "px";
-    layerPopup.width = width + "px";
-    layerPopup.height = height + "px";
+    layerPopup.style.width = width + "px";
+    layerPopup.style.height = height + "px";
     /* 레이어 팝업 가운데 배치 E */
 
     /* 레이어 팝업 컨텐츠 영역 추가 */
     const content = document.createElement("div");
-    content.className = "layer-content";
+    content.className="layer-content";
     layerPopup.append(content);
 
-    /* 레이어팝업닫기버튼추가 */
+    /* 레이어 팝업 닫기 버튼 추가 S */
     const button = document.createElement("button");
     const icon = document.createElement("i");
     button.className = "layer-close";
@@ -126,73 +123,94 @@ commonLib.popup = function(url, width = 350, height = 350, isAjax = false) {
     button.append(icon);
     layerPopup.prepend(button);
 
-    button.addEventListener("click", commonLib.popup_close);
+    button.addEventListener("click", commonLib.popupClose);
     /* 레이어 팝업 닫기 버튼 추가 E */
 
     document.body.append(layerPopup);
     document.body.append(layerDim);
-    /* 레이어 팝업 요소 동적 추가 E */
 
-    /* 팝업 컨텐츠 로드 */
-    if(isAjax){ // 컨텐트를 ajax로 로드
-        const {ajaxLoad} = commonLib;
 
-        ajaxLoad(url, 'GET', null, null, true).then((text)=>content.innerHTML = text);
+    /* 레이어팝업 요소 동적 추가 E */
 
-    } else{
+    /* 팝업 컨텐츠 로드 S */
+    if (isAjax) { // 컨텐트를 ajax로 로드
+        const { ajaxLoad } = commonLib;
+        ajaxLoad(url, null, 'GET', null, null, true)
+            .then((text) => content.innerHTML = text);
+    } else if (message) { // 메세지 팝업
+        content.innerHTML = `<div class='message'>
+                                <i class='xi-info'></i>
+                                ${message}
+                             </div>`;
+    } else { // iframe으로 로드
         const iframe = document.createElement("iframe");
         iframe.width = width - 80;
         iframe.height = height - 80;
         iframe.frameBorder = 0;
-        iframe.src = url;
-        layerPopup.append(iframe);
+        iframe.src = commonLib.url(url);
+        content.append(iframe);
     }
-    /* 팝업 컨텐츠 로드 */
+    /* 팝업 컨텐츠 로드 E */
 }
 
 /**
-* 레이어 팝업 제거
+* 메세지 출력 팝업
 *
 */
-commonLib.popup_close = function(){
-    const layerEls = document.querySelectorAll(".layer-dim", "layer-popup");
+commonLib.message = function(message, width = 350, height = 200) {
+    commonLib.popup(null, width, height, false, message);
+};
+
+/**
+* 레이어팝업 제거
+*
+*/
+commonLib.popupClose = function() {
+    const layerEls = document.querySelectorAll(".layer-dim, .layer-popup");
+    layerEls.forEach(el => el.parentElement.removeChild(el));
 };
 
 /**
 * 위지윅 에디터 로드
 *
 */
-commonLib.loadEditor = function(id, height = 350){
-    if(typeof ClassicEditor === 'undefined'){
-        return;
+commonLib.loadEditor = function(id, height = 350) {
+
+    if (typeof ClassicEditor === 'undefined' || !id) {
+        return Promise.resolve();
     }
 
     return new Promise((resolve, reject) => {
         (async() => {
-            try{
+            try {
                 const editor = await ClassicEditor.create(document.getElementById(id));
                 resolve(editor);
                 editor.editing.view.change((writer) => {
-                                    writer.setStyle(
-                                           "height",
-                                           `${height}px`,
-                                           editor.editing.view.document.getRoot()
-                                        );
-                                });
-//                const editorAreas = document.getElementsByClassName("ck-editor__editable");
-//                for(const el of editorAreas){
-//                    el.style.height = `${height}px !important`;
-//                }
-            } catch (err) {
-              console.error(err);
+                    writer.setStyle(
+                           "height",
+                           `${height}px`,
+                           editor.editing.view.document.getRoot()
+                        );
+                });
 
-              reject(err);
-          }
-      })();
-  });
+            } catch (err) {
+                console.error(err);
+
+                reject(err);
+            }
+        })();
+    });
 
 };
 
+commonLib.insertEditorImage = function(imageUrls, editor) {
+    editor = editor ?? window.editor;
+    if (!editor) return;
+
+    imageUrls = typeof imageUrls === 'string' ? [imageUrls] : imageUrls;
+
+    editor.execute('insertImage', { source: imageUrls });
+};
 
 window.addEventListener("DOMContentLoaded", function() {
     // 체크박스 전체 토글 기능 S
@@ -212,13 +230,13 @@ window.addEventListener("DOMContentLoaded", function() {
     }
     // 체크박스 전체 토글 기능 E
 
-    //팝업 버튼 클릭 처리 S
+    // 팝업 버튼 클릭 처리 S
     const showPopups = document.getElementsByClassName("show-popup");
-    for(const el of showPopups){
-        el.addEventListener("click", function(){
+    for (const el of showPopups) {
+        el.addEventListener("click", function() {
             const { url, width, height } = this.dataset;
-                        commonLib.popup(url, width, height);
-                    });
+            commonLib.popup(url, width, height);
+        });
     }
-    //팝업 버튼 클릭 처리 E
+    // 팝업 버튼 클릭 처리 E
 });

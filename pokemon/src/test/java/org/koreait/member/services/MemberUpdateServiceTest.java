@@ -32,7 +32,6 @@ public class MemberUpdateServiceTest {
      @Autowired
      private MemberRepository memberRepository;
 
-
      private RequestJoin form;
 
      @BeforeEach

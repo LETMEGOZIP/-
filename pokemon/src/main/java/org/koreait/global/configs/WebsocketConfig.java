@@ -9,7 +9,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @Configuration
 @EnableWebSocket
-public class WebsocketConfig implements WebSocketConfigurer {
+public class WebSocketConfig implements WebSocketConfigurer {
+
     @Autowired
     private MessageHandler messageHandler;
 
@@ -17,7 +18,11 @@ public class WebsocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // ws://localhost:3000/message
         String profile = System.getenv("spring.profiles.active");
+
+
         registry.addHandler(messageHandler, "msg")
                 .setAllowedOrigins(profile.contains("prod") ? "" : "http://localhost:3000");
+
+
     }
 }

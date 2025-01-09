@@ -8,8 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.awt.*;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -23,11 +21,12 @@ public class ApiDlControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void sentimentTest() throws Exception{
+    void sentimentTest() throws Exception {
+
         mockMvc.perform(post("/api/dl/sentiment")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("items", "재미없음", "재미있음")
-                .with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("items", "재미없음", "재미있음")
+                        .with(csrf().asHeader())
                 )
                 .andDo(print());
     }
