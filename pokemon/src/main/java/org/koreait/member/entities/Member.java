@@ -7,6 +7,8 @@ import lombok.ToString;
 import org.koreait.file.entities.FileInfo;
 import org.koreait.global.entities.BaseEntity;
 import org.koreait.member.constants.Gender;
+import org.koreait.member.social.constants.SocialChannel;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -22,7 +24,7 @@ public class Member extends BaseEntity implements Serializable {
     @Column(length=65, nullable = false, unique = true)
     private String email; // 이메일
 
-    @Column(length=65, nullable = false)
+    @Column(length=65)
     private String password;
 
     @Column(length=40, nullable = false)
@@ -56,6 +58,13 @@ public class Member extends BaseEntity implements Serializable {
     @Column(length=50)
     private String optionalTerms; // 선택 약관
 
+    @Enumerated(EnumType.STRING)
+    @Column(length=20)
+    private SocialChannel socialChannel; // 소셜 로그인 채널
+
+    @Column(length=65)
+    private String socialToken;
+
     @JsonIgnore
     @ToString.Exclude
     @OneToMany(mappedBy = "member")
@@ -66,4 +75,8 @@ public class Member extends BaseEntity implements Serializable {
 
     @Transient
     private FileInfo profileImage;
+
+    public boolean isKakaoConnected(){
+        return socialChannel != null && socialChannel == socialChannel.KAKAO && StringUtils.hasText(socialToken);
+    }
 }
