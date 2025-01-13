@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
+/*
  * 모든 사용자 정의 예외 상위 클래스
- *
  */
 @Getter @Setter
 public class CommonException extends RuntimeException {

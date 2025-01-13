@@ -37,7 +37,6 @@ public class Utils {
 
     /**
      * mobile, front 템플릿 분리 함수
-     *
      * @param path
      * @return
      */
@@ -48,8 +47,7 @@ public class Utils {
     }
 
     /**
-     * 메서지 코드로 조회된 문구
-     *
+     * 메세지 코드로 조회된 문구
      * @param code
      * @return
      */
@@ -72,8 +70,7 @@ public class Utils {
     }
 
     /**
-     * REST 커맨드 객체 검증 실패시에 에러 코드를 가지고 메세지 추출
-     *
+     * REST 커맨드 객체 검증 실패시 에러 코드를 가지고 메세지 추출
      * @param errors
      * @return
      */
@@ -105,7 +102,6 @@ public class Utils {
 
     /**
      * 이미지 출력
-     *
      * @param width
      * @param height
      * @param mode - image : 이미지 태그로 출력, background : 배경 이미지 형태 출력
@@ -167,8 +163,7 @@ public class Utils {
     }
 
     /**
-     * 메세지를 세션쪽에 저장해서 임시 팝업으로 띄운다.
-     *
+     * 메세지를 세션쪽에 저장해서 임시 팝업으로 띄운다
      * @param message
      */
     public void showSessionMessage(String message) {

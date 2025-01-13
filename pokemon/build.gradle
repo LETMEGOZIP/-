@@ -23,6 +23,10 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	set('springCloudVersion', "2023.0.3")
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -32,7 +36,8 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.4.1'
-
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
 
 
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
@@ -63,6 +68,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('test') {
