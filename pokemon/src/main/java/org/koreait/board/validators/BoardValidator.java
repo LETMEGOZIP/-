@@ -14,7 +14,7 @@ import org.springframework.validation.Validator;
 @Lazy
 @Component
 @RequiredArgsConstructor
-public class BoardValidator implements Validator, PasswordValidator {
+public class    BoardValidator implements Validator, PasswordValidator {
 
     private final MemberUtil memberUtil;
 
