@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.koreait.global.entities.BaseEntity;
 import org.koreait.member.entities.Member;
-import org.springframework.context.annotation.Lazy;
 
 import java.time.LocalDateTime;
 
-@Lazy
 @Data
 @Entity
+@Table(indexes = @Index(name = "idx_comment_data_created_at", columnList = "createdAt ASC"))
 public class CommentData extends BaseEntity {
     @Id @GeneratedValue
     private Long seq;
@@ -38,4 +37,7 @@ public class CommentData extends BaseEntity {
 
     @Column(length = 150)
     private String userAgent;
+
+    @Transient
+    private boolean editable; // 댓글 수정, 삭제 가능 여부
 }

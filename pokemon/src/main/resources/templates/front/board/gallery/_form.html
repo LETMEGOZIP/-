@@ -4,14 +4,16 @@
     <input type="hidden" name="bid" th:field="*{bid}">
     <input type="hidden" name="gid" th:field="*{gid}">
     <div class="error global" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></div>
-    <dl th:if="${categories != null && !categories.isEmpty()}"> </dl>
-    <dt th:text="#{분류}"></dt>
-    <dd>
-        <select name="category" th:field="*{category}">
-            <option value="" th:text="${#strings.concat('- ', #messages.msg('분류_선택'), ' -')}"></option>
-            <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
-        </select>
-    </dd>
+
+    <dl th:if="${categories != null && !categories.isEmpty()}">
+        <dt th:text="#{분류}"></dt>
+        <dd>
+            <select name="category" th:field="*{category}">
+                <option value="" th:text="${#strings.concat('- ', #messages.msg('분류_선택'), ' -')}"></option>
+                <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
+            </select>
+        </dd>
+    </dl>
     <dl>
         <dt th:text="#{작성자}"></dt>
         <dd>
@@ -24,7 +26,7 @@
             </th:block>
         </dd>
     </dl>
-    <dl th:if="${!@memberUtil.isLogin()}">
+    <dl th:if="${((requestBoard.mode == null || requestBoard.mode == 'write') && !@memberUtil.isLogin()) || (requestBoard.mode == 'edit' && boardData.member == null)}">
         <dt th:text="#{비밀번호}"></dt>
         <dd>
             <input type="password" name="guestPw" th:field="*{guestPw}">
@@ -46,12 +48,11 @@
 
             <th:block th:if="${board.useEditor && board.useEditorImage}">
                 <button type="button" class="file-upload image" th:text="#{이미지_업로드}" th:data-gid="*{gid}" data-location="editor" data-image-only="true"></button>
-                <div class="uploaded-files" id="editor-files">
-                    <span th:if="*{editorImages != null}" th:each="item : *{editorImages}" class="file-item" th:id="${'file-' + item.seq}">
-                       <a th:href="@{/api/file/download/{seq}(seq=${item.seq})}" th:text="${item.fileName}"></a>
-                        <i class="insert-editor xi-upload" th:data-url="${item.fileUrl}"></i>
-                        <i class="remove xi-close" th:data-seq="${item.seq}"></i>
-                    </span>
+                <div class="uploaded-files" id="main-images">
+                    <div th:if="*{mainImages != null}" th:each="item : *{mainImages}" th:object="${item}" class="image-item" th:id="*{'file-' + seq}">
+                        <i class="remove xi-close" th:data-seq="*{'file-' + seq}"></i>
+                        <th:block th:utext="*{@utils.showBackground(seq, 200, 100, 'inner show-image')}"></th:block>
+                    </div>
                 </div>
             </th:block>
         </dd>
@@ -68,8 +69,7 @@
             </div>
         </dd>
     </dl>
-    <script th:replace="~{common/_tpl_file::item-item}"></script>
-
+    <script th:replace="~{common/_tpl_file::image-item2}"></script>
     <script th:replace="~{common/_tpl_file::file-item}"></script>
 </th:block>
 </html>

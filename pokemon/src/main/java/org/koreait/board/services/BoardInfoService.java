@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.koreait.board.controllers.BoardSearch;
 import org.koreait.board.controllers.RequestBoard;
 import org.koreait.board.entities.Board;
 import org.koreait.board.entities.BoardData;
@@ -13,11 +14,11 @@ import org.koreait.board.entities.QBoardData;
 import org.koreait.board.exceptions.BoardDataNotFoundException;
 import org.koreait.board.repositories.BoardDataRepository;
 import org.koreait.board.services.configs.BoardConfigInfoService;
+import org.koreait.file.entities.FileInfo;
 import org.koreait.file.services.FileInfoService;
 import org.koreait.global.libs.Utils;
 import org.koreait.global.paging.ListData;
 import org.koreait.global.paging.Pagination;
-import org.koreait.member.constants.Authority;
 import org.koreait.member.entities.Member;
 import org.koreait.member.libs.MemberUtil;
 import org.modelmapper.ModelMapper;
@@ -25,7 +26,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +54,7 @@ public class BoardInfoService {
         return item;
     }
 
-    public RequestBoard getform(BoardData item){
+    public RequestBoard getForm(BoardData item){
         RequestBoard form = modelMapper.map(item, RequestBoard.class);
         form.setMode("edit");
 
@@ -187,12 +187,19 @@ public class BoardInfoService {
      * @param limit
      * @return
      */
-    public List<BoardData> getLatest(String bid, int limit){
+    public List<BoardData> getLatest(String bid, String category, int limit){
         BoardSearch search = new BoardSearch();
         search.setLimit(limit);
         search.setBid(List.of(bid));
+        search.setCategory(List.of(category));
+
         ListData<BoardData> data = getList(search);
-        return data.getItems();
+
+        return Objects.requireNonNullElse(data.getItems(), List.of());
+    }
+
+    public List<BoardData> getLatest(String bid, int limit){
+        return getLatest(bid, null, limit);
     }
 
     public List<BoardData> getLatest(String bid){
@@ -217,8 +224,14 @@ public class BoardInfoService {
     private void addInfo(BoardData item, boolean isView) {
         // 게시판 파일 정보 S
         String gid = item.getGid();
-        item.setEditorImages(fileInfoService.getList(gid, "editor"));
+        List<FileInfo> editorImages = fileInfoService.getList(gid, "editor");
+        item.setEditorImages(editorImages);
         item.setAttachFiles(fileInfoService.getList(gid, "attach"));
+
+        if(editorImages != null && !editorImages.isEmpty()){
+            FileInfo selectedImage = editorImages.stream().filter(FileInfo::isSelected).findFirst().orElseGet(()-> editorImages.get(0));
+            item.setSelectedImage(selectedImage);
+        }
         // 게시판 파일 정보 E
 
         // 이전, 다음 게시글
@@ -266,5 +279,26 @@ public class BoardInfoService {
 
     private void addInfo(BoardData item) {
         addInfo(item, false);
+    }
+
+    /**
+     * 게시글 번호와 게시판 id로 현재 페이지 구하기
+     *
+     * @param seq
+     * @param limit
+     * @return
+     */
+    public int getPage(String bid, Long seq, int limit){
+        QBoardData boardData = QBoardData.boardData;
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(boardData.board.bid.eq(bid))
+                .and(boardData.seq.goe(seq));
+
+        long total = boardDataRepository.count(builder); // 앞에 글 갯수
+
+        int page = (int)((double) total/limit);
+
+        return page;
     }
 }

@@ -11,8 +11,8 @@
                     <span th:if="*{commentCount > 0L}" th:text="*{#strings.concat('(', commentCount, ')')}"></span>
                 </a>
                 <div class="post-info">
-                    <span class="view-count">
-                        <th:block th:text="#{조회수}"></th:block>:
+                    <span class="category">
+                        <th:block th:if="#{조회수}"></th:block>:
                         <th:block th:text="*{viewCount >= 1000 ? #number.formatInteger(viewCount, 3, 'COMMA') : viewCount}"></th:block>
                     </span>
                     <span class="poster">

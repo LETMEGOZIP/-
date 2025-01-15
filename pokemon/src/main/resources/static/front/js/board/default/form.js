@@ -10,6 +10,12 @@ window.addEventListener("DOMContentLoaded", function() {
             el.addEventListener("click", e => commonLib.insertEditorImage(e.currentTarget.dataset.url));
         });
 
+        // 목록 노출 이미지 선택 처리
+        const selectImage = document.querySelectorAll(".select-images");
+        selectImage.forEach(el=>{
+            el.addEventListener("click", e=> commonLib.selectImage(e.currentTarget.dataset.seq));
+        });
+
         // 파일 삭제 버튼 이벤트 처리
         const removeEls = document.querySelectorAll(".file-item .remove");
         const { fileManager } = commonLib;
@@ -45,15 +51,16 @@ function callbackFileUpload(files) {
     const domParser = new DOMParser();
     const { insertEditorImage } = commonLib;
 
-    for (const {seq, location, fileName, fileUrl} of files) {
+    for (const {seq, location, fileName, fileUrl, selected, thumbUrl} of files) {
 
         let html = tpl;
         html = html.replace(/\[seq\]/g, seq)
                    .replace(/\[fileName\]/g, fileName)
-                    .replace(/\[fileUrl\]/g, fileUrl);
+                    .replace(/\[fileUrl\]/g, fileUrl, `${thumbUrl}&width=100&height=50`)
+                    .replace(/\addClass\]/g, addClass);
 
         const dom = domParser.parseFromString(html, "text/html");
-        const el = dom.querySelector(".file-item");
+        const el = dom.querySelector(location == 'editor' ? ".image-item" : ".file-item");
         const insertEditor = el.querySelector(".insert-editor");
         const removeEl = el.querySelector(".remove");
         removeEl.addEventListener("click", () => {
@@ -71,6 +78,9 @@ function callbackFileUpload(files) {
            imageUrls.push(fileUrl);
 
             insertEditor.addEventListener("click", () => insertEditorImage(fileUrl));
+            if(selectImageEl){ // 리스트 노출 메인 이미지 선택
+               selectImageEl.addEventListener("click", () => commonLib.selectImage(seq);
+            }
 
             targetEditor.append(el);
         } else {

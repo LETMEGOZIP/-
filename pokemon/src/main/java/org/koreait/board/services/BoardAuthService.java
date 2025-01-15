@@ -4,8 +4,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.koreait.board.entities.Board;
 import org.koreait.board.entities.BoardData;
+import org.koreait.board.entities.CommentData;
 import org.koreait.board.exceptions.BoardNotFoundException;
 import org.koreait.board.exceptions.GuestPasswordCheckException;
+import org.koreait.board.services.comment.CommentInfoService;
 import org.koreait.board.services.configs.BoardConfigInfoService;
 import org.koreait.global.exceptions.scripts.AlertBackException;
 import org.koreait.global.libs.Utils;
@@ -19,6 +21,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+import static org.koreait.member.entities.QMember.member;
+
 @Lazy
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class BoardAuthService {
     private final Utils utils;
     private final BoardConfigInfoService configInfoService;
     private final BoardInfoService infoService;
+    private final CommentInfoService commentInfoService;
     private final MemberUtil memberUtil;
     private final HttpSession session;
 
@@ -41,10 +46,18 @@ public class BoardAuthService {
             return;
         }
 
-        Board board = configInfoService.get(bid);
+        Board board = null;
+        CommentData comment = null;
+        if (mode.equals("comment")) { // 댓글 수정, 삭제
+            comment = commentInfoService.get(seq);
+            BoardData data = comment.getData();
+            board = data.getBoard();
+        } else {
+            board = configInfoService.get(bid);
+        }
 
         // 게시판 사용 여부 체크
-        if(!board.isOpen()){
+        if (!board.isOpen()) {
             throw new BoardNotFoundException();
         }
 
@@ -83,22 +96,41 @@ public class BoardAuthService {
             } else if(!memberUtil.isLogin() || !poster.getEmail().equals(member.getEmail())){ // 회원 게시글 - 직접 작성한 회원만 수정 가능하게 통제. 미로그인 상태 또는 로그인 상태이지만 작성자의 이메일과 일치하지 않는 경우
                 isVerified = false;
             }
+        } else if (mode.equals("comment")) { // 댓글 수정 삭제
+            Member commenter = comment.getMember();
+            if (commenter == null) { // 비회원으로 작성한 댓글
+                if (session.getAttribute("comment_" + seq) == null) { // 댓글 비회원 인증 X
+                    session.setAttribute("cSeq", seq);
+                    throw new GuestPasswordCheckException();
+                }
+            } else if (!memberUtil.isLogin() || !commenter.getEmail().equals(member.getEmail())) { // 회원이 작성한 댓글
+                isVerified = false;
+            }
         }
 
-        if(authority == Authority.USER || !memberUtil.isLogin() || authority == Authority.ADMIN && !memberUtil.isAdmin()){ // 회원권한+로갓, 관리자권한 + 관리자x
+        if ((authority == Authority.USER && !memberUtil.isLogin()) || (authority == Authority.ADMIN && !memberUtil.isAdmin())) { // 회원 권한 + 로그인 X, 관리자 권한 + 관리자 X
             isVerified = false;
         }
-        if(!isVerified){
+
+        if (!isVerified) {
             throw new AlertBackException(utils.getMessage("UnAuthorized"), HttpStatus.UNAUTHORIZED);
         }
     }
 
-    public void check(String mode, String bid){
+    public void check(String mode, String bid) {
         check(mode, bid, null);
     }
-    public void check(String mode, Long seq){
-        BoardData item = infoService.get(seq);
+
+    public void check(String mode, Long seq) {
+        BoardData item = null;
+        if (mode.equals("comment")) {
+            CommentData comment = commentInfoService.get(seq);
+            item = comment.getData();
+        } else {
+            item = infoService.get(seq);
+        }
+
         Board board = item.getBoard();
-        check(mode, board.getBid(),seq);
+        check(mode, board.getBid(), seq);
     }
 }

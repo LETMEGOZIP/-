@@ -26,11 +26,7 @@
             </div>
             <div class="right">
                 <span class="ip-info" th:text="*{'IP:' + ipAddr}"></span>
-                <span class="post-date">
-                    <th:block th:text="#{작성일시}"></th:block>
-                    <th:block th:text="*{#temporals.format(createdAt, 'yyyy.MM.dd HH:mm:ss'}"></th:block>
-                </span>
-            </div>
+
         </div>
         <!-- // post info -->
         <div class="content" th:utext="*{content}"></div>
